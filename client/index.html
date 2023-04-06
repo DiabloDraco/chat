@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chat</title>
+</head>
+
+<body>
+    <div>
+        <ul id="messages"></ul>
+    </div>
+    <div>
+        <form id="btn" action="">
+            <input type="text" name="" id="message" />
+            <select name="" id="userTo">
+
+            </select>
+            <button>send</button>
+            <button onclick="sendAll()" type="button">send All</button>
+        </form>
+    </div>
+    <script src="https://cdn.socket.io/4.6.0/socket.io.min.js"
+        integrity="sha384-c79GN5VsunZvi+Q/WObgk2in0CbZsHnjEqvFxC5DxHn9lTfNce2WW6h2pH6u/kF+"
+        crossorigin="anonymous"></script>
+    <script>
+        async function getSelect() {
+            let fields = await fetch("http://localhost:3000/api/users/getall", {
+                headers: { "mode": "no-cors" }
+            })
+            fields = await fields.json()
+            let fragment = document.createDocumentFragment()
+            for (let i = 0; i < fields.length; i++) {
+                console.log(fields);
+                let opt = document.createElement("option")
+                opt.value = fields[i].id
+                opt.textContent = fields[i].login
+                fragment.appendChild(opt)
+            }
+            userTo.appendChild(fragment)
+        }
+        getSelect()
+
+        let token = localStorage.getItem("token")
+        const socket = io('http://localhost:3000', { auth: { token: token } });
+        const message = document.getElementById('message');
+        const userTo = document.getElementById('userTo');
+        const messages = document.getElementById('messages');
+        const btn = document.getElementById('btn');
+        btn.addEventListener('submit', emitMessage);
+        function sendAll() {
+            socket.emit('send-all', { message: message.value });
+            message.value = '';
+        }
+
+        function emitMessage(e) {
+            e.preventDefault();
+
+            socket.emit('message', { message: message.value, userTo: userTo.value });
+            message.value = '';
+        }
+
+        socket.on('new-message', ({ message }) => {
+            handleNewMessage(message);
+        });
+
+        function handleNewMessage(message) {
+            messages.appendChild(buildNewMessage(message));
+        }
+
+        function buildNewMessage(message) {
+            let li = document.createElement('li');
+            li.textContent = message;
+            return li;
+        }
+    </script>
+</body>
+
+</html>
