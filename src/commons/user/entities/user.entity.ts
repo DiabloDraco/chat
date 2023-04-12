@@ -28,7 +28,7 @@ export class User extends BaseEntity {
   @Column({ nullable: true, name: 'last_visit' })
   lastVisit: Date;
 
-  @OneToMany((type) => Message, (message) => message.user)
+  @OneToMany((type) => Message, (message) => message.user, { nullable: true })
   messages: Message[];
 
   @Column({ name: 'socket_id', nullable: true })
