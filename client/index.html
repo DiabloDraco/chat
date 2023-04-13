@@ -27,7 +27,7 @@
         crossorigin="anonymous"></script>
     <script>
         async function getSelect() {
-            let fields = await fetch("http://localhost:3000/api/users/getall", {
+            let fields = await fetch("http://83.69.136.206:4000/api/users/getall", {
                 headers: { "mode": "no-cors" }
             })
             fields = await fields.json()
@@ -43,8 +43,8 @@
         }
         getSelect()
 
-        let token = localStorage.getItem("token")
-        const socket = io('http://localhost:3000', { auth: { token: token } });
+        let token = window.localStorage.getItem("token")
+        const socket = io('http://83.69.136.206:4000', { auth: { token: token } });
         const message = document.getElementById('message');
         const userTo = document.getElementById('userTo');
         const messages = document.getElementById('messages');
